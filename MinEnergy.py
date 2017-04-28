@@ -30,8 +30,12 @@ class EV3_Config:
              'generationCount': (int,True),
              'randomSeed': (int,True),
              'crossoverFraction': (float,True),
-             'minLimit': (float,True),
-             'maxLimit': (float,True)}
+             'minLimit': (int,True),
+             'maxLimit': (int,True),
+             'selfEnergyVector':(list,True),
+             'interactionEnergyMatrix':(list,True),
+             'latticeLength': (int,True),
+             'numParticleType':(int,True)}
      
     #constructor
     def __init__(self, inFileName):
@@ -64,26 +68,33 @@ class EV3_Config:
         return str(yaml.dump(self.__dict__,default_flow_style=False))
          
 
-#Simple fitness function example: 1-D Rastrigrin function
+#energy fitness function 
 #        
-def fitnessFunc(x):
-    return -10.0-(0.04*x)**2+10.0*math.cos(0.04*math.pi*x)
-
+def fitnessFunc(seq,latticLength,numParticleType,interactionEnergyMatrix,selfEnergyVecor):
+    energy=0
+    for i in range(latticLength):
+        if i==0: 
+            energy=selfEnergyVecor[seq[i]]+interactionEnergyMatrix[seq[i]][seq[i+1]] 
+        elif i==latticLength:
+            energy=selfEnergyVecor[seq[i]]
+        else:                  
+            energy=selfEnergyVecor[seq[i]]+interactionEnergyMatrix[seq[i-1][i]]+interactionEnergyMatrix[seq[i]][seq[i+1]]       
+    return energy
 
 #Print some useful stats to screen
 def printStats(pop,gen):
     print('Generation:',gen)
     avgval=0
-    maxval=pop[0].fit 
+    minEnergy=pop[0].fit 
     sigma=pop[0].sigma
     for ind in pop:
         avgval+=ind.fit
-        if ind.fit > maxval:
-            maxval=ind.fit
+        if ind.fit < minEnergy:
+            minEnergy=ind.fit
             sigma=ind.sigma
         print(ind)
 
-    print('Max fitness',maxval)
+    print('Min energy',maxval)
     print('Sigma',sigma)
     print('Avg fitness',avgval/len(pop))
     print('')
@@ -105,6 +116,12 @@ def ev3(cfg):
     Individual.fitFunc=fitnessFunc
     Individual.uniprng=uniprng
     Individual.normprng=normprng
+
+    Individual.selfEnergyVector=cfg.selfEnergyVector#stanley
+    Individual.interactionEnergyMatrix=cfg.interactionEnergyMatrix#stanley
+    Individual.latticeLength=cfg.latticeLength#stanley
+    Individual.numParticleType=cfg.numParticleType#stanley
+
     Population.uniprng=uniprng
     Population.crossoverFraction=cfg.crossoverFraction
       
