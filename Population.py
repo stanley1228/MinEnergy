@@ -80,9 +80,9 @@ class Population:
         #compete
         newPop=[]        
         for index1,index2 in zip(indexList1,indexList2):
-            if self[index1].fit > self[index2].fit:
+            if self[index1].fit < self[index2].fit: #stanley > ==> <
                 newPop.append(copy.deepcopy(self[index1]))
-            elif self[index1].fit < self[index2].fit:
+            elif self[index1].fit > self[index2].fit:#stanley < ==> >
                 newPop.append(copy.deepcopy(self[index2]))
             else:
                 rn=self.uniprng.random()
@@ -100,7 +100,7 @@ class Population:
 
     def truncateSelect(self,newPopSize):
         #sort by fitness
-        self.population.sort(key=attrgetter('fit'),reverse=True)
+        self.population.sort(key=attrgetter('fit'),reverse=False)#stanley false small to big
         
         #then truncate the bottom
         self.population=self.population[:newPopSize]  

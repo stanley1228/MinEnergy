@@ -74,11 +74,11 @@ def fitnessFunc(seq,latticLength,numParticleType,interactionEnergyMatrix,selfEne
     energy=0
     for i in range(latticLength):
         if i==0: 
-            energy=selfEnergyVecor[seq[i]]+interactionEnergyMatrix[seq[i]][seq[i+1]] 
-        elif i==latticLength:
-            energy=selfEnergyVecor[seq[i]]
+            energy+=selfEnergyVecor[seq[i]]+interactionEnergyMatrix[seq[i]][seq[i+1]] 
+        elif i==(latticLength-1):
+            energy+=selfEnergyVecor[seq[i]]+interactionEnergyMatrix[seq[i-1]][seq[i]]
         else:                  
-            energy=selfEnergyVecor[seq[i]]+interactionEnergyMatrix[seq[i-1][i]]+interactionEnergyMatrix[seq[i]][seq[i+1]]       
+            energy+=selfEnergyVecor[seq[i]]+interactionEnergyMatrix[seq[i-1]][seq[i]]+interactionEnergyMatrix[seq[i]][seq[i+1]]       
     return energy
 
 #Print some useful stats to screen
@@ -94,7 +94,7 @@ def printStats(pop,gen):
             sigma=ind.sigma
         print(ind)
 
-    print('Min energy',maxval)
+    print('Min energy',minEnergy)
     print('Sigma',sigma)
     print('Avg fitness',avgval/len(pop))
     print('')
